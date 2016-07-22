@@ -30,7 +30,7 @@ LL Pow(LL a, LL b){
 int va[N], vb[N], numa, numb, n;
 
 struct node{
-	int sumcnt;
+	LL sumcnt;
 	LL sumv, mul;
 }t[N << 2];
 #define L (o << 1)
@@ -42,7 +42,7 @@ void Push_up(int o){
 	t[o].sumcnt = t[L].sumcnt + t[R].sumcnt;
 	t[o].sumv = (t[L].sumv + t[R].sumv) % P;
 }
-void change(int o, int val){
+void change(int o, LL val){
 	t[o].sumv = t[o].sumv * val % P;
 	t[o].mul = t[o].mul * val % P;
 }
@@ -53,11 +53,12 @@ void Push_down(int o){
 		t[o].mul = 1;
 	}
 }
-int query(int o, int l, int r, int ql, int qr){
+LL query(int o, int l, int r, int ql, int qr){
+	if (ql > qr) return 0;
 	if (ql <= l && qr >= r) return t[o].sumcnt;
 	else{
 		Push_down(o);
-		int ans = 0;
+		LL ans = 0;
 		if (ql <= mid) ans += query(lch, ql, qr);
 		if (qr >  mid) ans += query(rch, ql, qr);
 		return ans;
@@ -75,7 +76,9 @@ void update(int o, int l, int r, int pos){
 }
 void updatev(int o, int l, int r, int pos){
 	if (l == r){
-		t[o].sumv = (Pow(2, query(1, 1, n, 1, pos)) - 1) * Pow(3, vb[pos]) % P;
+		t[o].sumv = (Pow(2, query(1, 1, n, pos, pos)) - 1) * Pow(2, query(1, 1, n, 1, pos - 1)) % P * Pow(3, vb[pos]) % P;
+//		t[o].sumv = (Pow(2, query(1, 1, n, 1, pos)) - 1) * Pow(3, vb[pos]) % P;
+//		printf("pos = %d t[o].sumv = %lld\n", vb[pos],t[o].sumv);
 	}else{
 		Push_down(o);
 		if (pos <= mid) updatev(lch, pos);
@@ -119,21 +122,24 @@ int main(){
 	while(scanf("%d", &n) == 1){
 		for(int i = 1; i <= n; i ++) p[i].read();
 		pre();
-//		for(int i = 1; i <= n; i ++) printf("%d %d\n",p[i].a, p[i].b);
-		int ans = 0;
+//		for(int i = 1; i <= n; i ++) printf("%d %d\n",va[p[i].a], vb[p[i].b]);
+		LL ans = 0;
 		LL now = 0;
 		for(int i = 1; i <= n; i ++){
-			now = Pow(2, query(1, 1, n, 1, p[i].b)) * Pow(3, va[p[i].b]) % P;
-			update(1, 1, n, p[i].b);
-			updatev(1,1,n,p[i].b);
+			now = Pow(2, query(1, 1, n, 1, p[i].b)) * Pow(3, vb[p[i].b]) % P;
+			update (1, 1, n, p[i].b);
+			updatev(1, 1, n, p[i].b);
 			tmp = 0;
 			queryv(1 ,1, n, p[i].b + 1, n);
-			ans = ((LL)ans + ((now + tmp) % P) * Pow(2, va[p[i].a]) % P) % P;
-//			cout << "tmp = " << tmp * Pow(2, va[p[i].a]) % P << endl;
-//			cout << "ans = " << ans << endl;
+			ans = (ans + ((now + tmp) % P) * Pow(2, va[p[i].a]) % P) % P;
+#ifdef debug
+			cout << "now = " << now << " tmp = " << tmp << endl;
+			cout << "tmp = " << (tmp) * Pow(2, va[p[i].a]) % P << endl;
+			cout << "ans = " << ans << endl;
+#endif 
 			modify(1, 1, n, p[i].b + 1, n);
 		}
-		printf("%d\n",ans);
+		printf("%lld\n",ans);
 	}
 	return 0;
 }
