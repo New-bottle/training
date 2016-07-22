@@ -119,7 +119,6 @@ int main(){
 	while(scanf("%d", &n) == 1){
 		for(int i = 1; i <= n; i ++) p[i].read();
 		pre();
-//		for(int i = 1; i <= n; i ++) printf("%d %d\n",p[i].a, p[i].b);
 		int ans = 0;
 		LL now = 0;
 		for(int i = 1; i <= n; i ++){
@@ -129,8 +128,6 @@ int main(){
 			tmp = 0;
 			queryv(1 ,1, n, p[i].b + 1, n);
 			ans = ((LL)ans + ((now + tmp) % P) * Pow(2, va[p[i].a]) % P) % P;
-//			cout << "tmp = " << tmp * Pow(2, va[p[i].a]) % P << endl;
-//			cout << "ans = " << ans << endl;
 			modify(1, 1, n, p[i].b + 1, n);
 		}
 		printf("%d\n",ans);
