@@ -7,20 +7,28 @@ public class Main{
 	static BigInteger Ten = new BigInteger("10");
 	static BigInteger Base;
 	static String in, out;
-	static Map<char, int> get = new HashMap<char, int>();
-	static Map<int, char> c = new HashMap<int, char>();
+	static Map<Character, Integer> get = new HashMap<Character, Integer>();
+	static Map<Integer, Character> c = new HashMap<Integer, Character>();
 	static int prebase, targetbase, testcase;
 	public static void main(String[] args){
-		for(int i = 0; i < 9; i ++){
-			c.put(i, i + '0');
-			get.put(i + '0', i);
+		for(int i = 0; i < 10; i ++){
+			c.put(i, (char)(i + (char)'0'));
+			get.put((char)(i + '0'), i);
 		}
 		for(int i = 0; i < 26; i ++){
-			c.put(i + 10, i + 'A');
-			c.put(i + 36, i + 'a');
-			get.put(i + 'A', i + 10);
-			get.put(i + 'a', i + 36);
+			c.put(i + 10, (char)(i + 'A'));
+			c.put(i + 36, (char)(i + 'a'));
+			get.put((char)(i + 'A'), i + 10);
+			get.put((char)(i + 'a'), i + 36);
 		}
+		
+		/*
+		Set<Character> test = get.keySet();
+		for(Character t : test){
+			System.out.println(t + " , " + get.get(t));
+		}
+		*/
+		
 		Scanner cin = new Scanner(System.in);
 		testcase = cin.nextInt();
 		while(testcase > 0){
@@ -30,17 +38,23 @@ public class Main{
 			Base = BigInteger.valueOf(prebase);
 			targetbase = cin.nextInt();
 			in = cin.next();
-			int len = in.length(), val;
-			for(int i = len - 1; i >= 0; i --){
+			Integer len = in.length(), val;
+
+			for(int i = 0; i < len; i ++){
 				val = get.get(in.charAt(i));
 				t = BigInteger.valueOf(val);
 				ori = (ori.multiply(Base)).add(t);
-			}
+			}//ok
+
 			Base = BigInteger.valueOf(targetbase);
-			int i = 0;
+			Integer i;
 			out = new String("");
+			if (ori.compareTo(Zero) == 0){
+				out = out + "0";
+			}
 			while(ori.compareTo(Zero) != 0){
-				out = out + (c.get(ori.mod(Base)));
+				i = ori.mod(Base).intValue();
+				out = out + (c.get(i));
 				ori = ori.divide(Base);
 				i ++;
 			}
@@ -48,6 +62,7 @@ public class Main{
 			tmp.reverse();
 			System.out.println(prebase + " " + in);
 			System.out.println(targetbase + " " + tmp);
+			if (testcase > 0) System.out.println();
 		}
 	}
 }
