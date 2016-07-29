@@ -1,1 +1,2 @@
 When the number is equal to zero, I got a null string.
+I can't use a BigInteger to find a target char in a Map<Integer,Character>
