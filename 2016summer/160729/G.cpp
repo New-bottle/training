@@ -41,6 +41,10 @@ void dfs(int x){
 	ed[x] = dfs_clock;
 }
 
+int t[N << 3];
+void Push_up(int o){
+	t[o] = max(t[L], t[R]);
+}
 int main(){
 	int T, cs = 0;
 	scanf("%d", &T);
@@ -56,13 +60,33 @@ int main(){
 			add(x, y);
 		}
 		dfs(1);
+		tot = 0;
 		for(int i = 1; i <= m; i ++){
 			scanf("%d%d%d", &a[i].key, &a[i].chest, &a[i].val);
 			lca = LCA(a[i].key, a[i].chest);
 			if (a[i].key == a[i].chest){
-				
-			}else if (a[i].key == lca || a[i].chest == lca){
+				for(int i = head[a[i].key]; i; i = nxt[i])
+					if (to[i] != fa[a[i].key][0]){
+						event[++ tot] = (rec){st[to[i]], ed[to[i]], st[to[i]], ed[to[i]], a[i].val};
+			}else if (a[i].key == lca){
+				for(int i = head[a[i].key]; i; i = nxt[i])
+					if (to[i] != fa[a[i].key][0] && LCA(to[i], a[i].chest) == to[i]){
+						y = to[i];
+						break;
+					}
+				event[++ tot] = (rec){1, st[y] - 1, st[a[i].chest], ed[a[i].chest], a[i].val};
+				event[++ tot] = (rec){ed[y] + 1, n, st[a[i].chest], ed[a[i].chest], a[i].val};
+			}else if (a[i].chest == lca){
+				for(int i = head[a[i].chest]; i; i = nxt[i])
+					if (to[i] != fa[a[i].chest][0] && LCA(to[i], a[i].key) == to[i]){
+						y = to[i];
+						break;
+					}
+				event[++ tot] = (rec){st[a[i].key], ed[a[i].key], 1, st[y] - 1, a[i].val};
+				event[++ tot] = (rec){st[a[i].key], ed[a[i].key], ed[y] + 1, n, a[i].val};
 			}else{
+				event[++ tot] = (rec){st[a[i].key], ed[a[i].key], st[a[i].chest], ed[a[i].chest], a[i].val};
+			}
 		}
 	}
 	return 0;
