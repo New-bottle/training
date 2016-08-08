@@ -1,0 +1,36 @@
+4
+6
+START = FIRST + SECND
+FIRST = D + E
+SECND = F + E
+D = good
+E = times
+F = bad
+START
+debate
+6
+START = FIRST + SECND
+FIRST = D + E
+SECND = F + E
+D = good
+E = times
+F = bad
+START
+debatex
+6
+START = FIRST + SECND
+FIRST = D + E
+SECND = F + E
+D = good
+E = times
+F = bad
+START
+debate
+
+
+3
+ST = A + B
+A = ab
+B = zza
+ST
+azz
