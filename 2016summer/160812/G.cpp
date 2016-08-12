@@ -49,8 +49,6 @@ LL solve(LL x){
 		ans = ans * (10 - min(p - 1, k - 1));
 	}
 	
-	ans = 1;
-	
 	cout << res << endl;
 	return res;
 }
