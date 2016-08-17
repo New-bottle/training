@@ -6,7 +6,7 @@
 #include<algorithm>
 using namespace std;
 
-const int INF = 300010;
+const int INF = 10010;
 const int N = 6010;
 vector<int>G[N], f[N], g[N];
 vector<int>pre[N], suc[N];
@@ -66,6 +66,8 @@ void dfs(int x, int fa){
 		}
 		for(int j = 0; j < f[y].size(); j ++)
 			pre[i][j] = min(i ? pre[i - 1][j] : INF, f[y][j]);
+		for(int j = f[y].size(); j <= lf[x]; j ++)
+			pre[i][j] = i ? pre[i - 1][j] : INF;
 	}
 	if (suc[G[x].size()].size() < f[x].size()) suc[G[x].size()].resize(f[x].size(), INF);
 	for(int i = G[x].size() - 1; i >= 0; i --) {
@@ -73,11 +75,13 @@ void dfs(int x, int fa){
 		if (suc[i].size() < f[x].size()) suc[i].resize(f[x].size(), INF);
 		if (y == fa) {
 			for(int j = 0; j <= lf[x]; j ++)
-				suc[i][j] = i ? suc[i + 1][j] : INF;
+				suc[i][j] = i < G[x].size() - 1 ? suc[i + 1][j] : INF;
 			continue;
 		}
 		for(int j = 0; j < f[y].size(); j ++)
-			suc[i][j] = min(i ? suc[i + 1][j] : INF, f[y][j]);
+			suc[i][j] = min(i < G[x].size() - 1 ? suc[i + 1][j] : INF, f[y][j]);
+		for(int j = f[y].size(); j <= lf[x]; j ++)
+			suc[i][j] = i < G[x].size() - 1 ? suc[i + 1][j] : INF;
 	}
 	for(int i = 0; i < (int)G[x].size(); i ++) {
 		int y = G[x][i];
@@ -123,7 +127,6 @@ void dfs(int x, int fa){
 	}
 	ans = max(ans, lf[x]);
 	ans = max(ans, lg[x]);
-	printf("dfs %d %d ans = %d\n", x, fa, ans);
 }
 
 int main(){
@@ -141,22 +144,8 @@ int main(){
 		scanf("%d%d", &x, &y);
 		G[x].push_back(y);
 		G[y].push_back(x);
-//		add(x, y);
 	}
 	dfs(1, -1);
-	/*
-	for(int i = 1; i <= n; i ++){
-		for(int j = 1; j <= n; j ++)
-			printf("%d ", f[i][j]);
-		puts("");
-	}
-	puts("");
-	for(int i = 1; i <= n; i ++){
-		for(int j = 1; j <= n; j ++)
-			printf("%d ", g[i][j]);
-		puts("");
-	}
-	*/
 	printf("%d\n", ans);
 	return 0;
 }
