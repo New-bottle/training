@@ -4,6 +4,7 @@
 #include<iostream>
 #include<algorithm>
 using namespace std;
+//#define debug
 
 typedef long long LL;
 const int N = 100010;
@@ -25,7 +26,7 @@ int v[N << 2], n, m, Q, cnt;
 struct seg {
 	LL sum, add;
 	int len;
-}t[N << 2];
+}t[N << 4];
 #define L (o << 1)
 #define R (o << 1 | 1)
 #define mid ((l + r) >> 1)
@@ -44,7 +45,7 @@ void build(int o, int l, int r) {
 	t[o].len = t[L].len + t[R].len;
 	Push_up(o);
 }
-void change(int o, int v) {
+void change(int o, LL v) {
 	t[o].add += v;
 	t[o].sum += (LL)v * t[o].len;
 }
@@ -55,7 +56,7 @@ void Push_down(int o) {
 		t[o].add = 0;
 	}
 }
-void update(int o, int l, int r, int ql, int qr, int v) {
+void update(int o, int l, int r, int ql, int qr, LL v) {
 	if (ql <= l && qr >= r) change(o, v);
 	else {
 		Push_down(o);
@@ -75,7 +76,7 @@ LL query(int o, int l, int r, int ql, int qr) {
 	}
 }
 void print(int o, int l, int r) {
-	printf("%d (%d, %d) %lld %lld %d\n", o, l, r, t[o].sum, t[o].add, t[o].len);
+	printf("%2d (%d, %d) %lld %lld %d\n", o, l, r, t[o].sum, t[o].add, t[o].len);
 	if (l == r) return;
 	print(lch); print(rch);
 }
@@ -92,8 +93,10 @@ void solve(int ql, int qr, int l, int r) {
 	int mid = (l + r) >> 1;
 	for(int i = l; i <= mid; i ++)
 		update(1, 1, cnt, c[i].l + 1, c[i].r, 1);
-//	printf("solve %d %d %d %d\n", ql, qr, l, r);
-//	print(1, 1, cnt);
+#ifdef debug
+	printf("solve %d %d %d %d\n", ql, qr, l, r);
+	print(1, 1, cnt);
+#endif
 	for(int i = ql; i <= qr; i ++)
 		q[i].tmp = query(1, 1, cnt, q[i].l + 1, q[i].r);
 	int qm = stable_partition(q + ql, q + qr + 1, part) - q - 1;
