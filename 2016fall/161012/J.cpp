@@ -6,6 +6,7 @@
 using namespace std;
 //#define debug
 
+typedef long long LL;
 const int N = 2010, M = 100010;
 
 struct edge{
@@ -79,7 +80,8 @@ struct LCT {
 }t;
 
 struct node {
-	int sum, l, r;
+	LL sum;
+	int l, r;
 };
 namespace segtree {
 	node T[M * 30];
@@ -91,9 +93,10 @@ namespace segtree {
 		if (pos <= mid) update(T[o].l, l, mid, pos, v);
 		else update(T[o].r, mid + 1, r, pos, v);
 	}
-	int query(int i, int j, int l, int r, int ql, int qr) {
+	LL query(int i, int j, int l, int r, int ql, int qr) {
 		if (ql <= l && qr >= r) return T[j].sum - T[i].sum;
-		int mid = (l + r) >> 1, ans = 0;
+		int mid = (l + r) >> 1;
+		LL ans = 0;
 		if (ql <= mid) ans += query(T[i].l, T[j].l, l, mid, ql, qr);
 		if (qr >  mid) ans += query(T[i].r, T[j].r, mid + 1, r, ql, qr);
 		return ans;
