@@ -7,7 +7,8 @@ using namespace std;
 //#define debug
 
 typedef long long LL;
-const int N = 2010, M = 100010;
+const int N = 200010, M = 300010;
+const int INF = 1e9;
 
 struct edge{
 	int x, y, w, who;
@@ -30,46 +31,45 @@ struct LCT {
 		memset(mx, 0, sizeof mx);
 		memset(rev, 0, sizeof rev);
 	}
-	void Push_up(int x) {
+	inline void Push_up(int x) {
 		mx[x] = x;
 		if (v[mx[L]] > v[mx[x]]) mx[x] = mx[L];
 		if (v[mx[R]] > v[mx[x]]) mx[x] = mx[R];
 	}
-	void Push_down(int x) {
+	inline void Push_down(int x) {
 		if (rev[x]) rev[x] = 0, rev[L] ^= 1, rev[R] ^= 1, swap(L, R);
 	}
 	bool not_root(int x) {
 		return c[fa[x]][0] == x || c[fa[x]][1] == x;
 	}
-	void Rotate(int x) {
+	inline void Rotate(int x) {
 		int y = fa[x], z = fa[y], l = c[y][1] == x, r = l ^ 1;
 		if (not_root(y)) c[z][c[z][1] == y] = x;
 		fa[x] = z; fa[y] = x; fa[c[x][r]] = y;
 		c[y][l] = c[x][r]; c[x][r] = y;
 		Push_up(y);
 	}
-	void preview(int x) {
+	inline void preview(int x) {
 		top = 0; st[++top] = x;
-		for(; not_root(x); x = fa[x])
-			st[++top] = fa[x];
+		for(; not_root(x); x = fa[x]) st[++top] = fa[x];
 		for(int i = top; i; i --) Push_down(st[i]);
 	}
-	void splay(int x) {
+	inline void splay(int x) {
 		int y = 0;
 		for(preview(x); not_root(x); Rotate(x))
 			not_root(y = fa[x]) ? Rotate((c[y][1] == x ^ c[fa[y]][1] == y ? x : y)), 1 : 1;
 		Push_up(x);
 	}
-	void access(int x, int las = 0) {
+	inline void access(int x, int las = 0) {
 		for(; x; splay(x), c[x][1] = las, las = x, x = fa[x]);
 	}
-	void makeroot(int x) {
+	inline void makeroot(int x) {
 		access(x), splay(x), rev[x] ^= 1;
 	}
-	void link(int x, int y) {
+	inline void link(int x, int y) {
 		makeroot(x), fa[x] = y;
 	}
-	void cut(int x, int y) {
+	inline void cut(int x, int y) {
 		makeroot(x), access(y), splay(y);
 		if (c[y][0] == x) c[y][0] = fa[x] = 0;
 	}
@@ -86,7 +86,7 @@ struct node {
 namespace segtree {
 	node T[M * 30];
 	int rt[M], tot;
-	void update(int &o, int l, int r, int pos, int v) {
+	inline void update(int &o, int l, int r, int pos, int v) {
 		T[++tot] = T[o], o = tot, T[o].sum += v;
 		if (l == r) return;
 		int mid = (l + r) >> 1;
@@ -94,6 +94,7 @@ namespace segtree {
 		else update(T[o].r, mid + 1, r, pos, v);
 	}
 	LL query(int i, int j, int l, int r, int ql, int qr) {
+		if (qr < ql) return 0;
 		if (ql <= l && qr >= r) return T[j].sum - T[i].sum;
 		int mid = (l + r) >> 1;
 		LL ans = 0;
@@ -103,12 +104,11 @@ namespace segtree {
 	}
 }
 
-int n, m, fa[N], root[N], v[M], cnt;
+int n, m, fa[N], root[M], v[M], cnt;
 int getfa(int x) {return fa[x] == x ? x : fa[x] = getfa(fa[x]);}
 
-void ready() {
+inline void ready() {
 	sort(v + 1, v + m + 1);
-//	cnt = m;
 	cnt = unique(v + 1, v + m + 1) - v - 1;
 	for(int i = 1; i <= m; i ++) 
 		e[i].w = lower_bound(v + 1, v + cnt + 1, e[i].w) - v;
@@ -136,6 +136,10 @@ void ready() {
 	using namespace segtree;
 	for(int i = 1; i <= m; i ++) {
 		rt[i] = rt[i - 1];
+#ifdef debug
+		printf("%d %d %d\n", e[i].x, e[i].y, e[i].w);
+		printf("e[%d].who = %d\n", i, e[i].who);
+#endif
 		update(rt[i], 0, cnt, e[e[i].who].w, v[e[i].w]);
 	}
 }
@@ -150,6 +154,27 @@ void init() {
 	memset(rt, 0, sizeof rt);
 }
 
+inline int gl(int x) {
+	int l = 1, r = m, mid, ans = m + 1;
+	if (v[cnt] < x) return m + 1;
+	while(l <= r) {
+		mid = (l + r) >> 1;
+		if (v[e[mid].w] >= x) ans = mid, r = mid - 1;
+		else l = mid + 1;
+	}
+	return ans;
+}
+inline int gr(int x) {
+	int l = 1, r = m, mid, ans = m;
+	if (v[1] > x) return 0;
+	while(l <= r) {
+		mid = (l + r) >> 1;
+		if (v[e[mid].w] <= x) ans = mid, l = mid + 1;
+		else r = mid - 1;
+	}
+	return ans;
+}
+
 int main(){
 	int T;
 	scanf("%d", &T);
@@ -161,19 +186,21 @@ int main(){
 			v[i] = e[i].w;
 		}
 		ready();
-
-		int q, ans = 0;
+		int q;
 		scanf("%d", &q);
+		LL ans = 0;
 		for(int i = 1; i <= q; i ++) {
-			int l, r;
-			scanf("%d%d", &l, &r);
-			l -= ans; r -= ans;
-			for(int i = 1; i <= m; i ++) v[i] = e[i].w;
-			l = lower_bound(v + 1, v + m + 1, l) - v;
-			r = upper_bound(v + 1, v + m + 1, r) - v - 1;
+			int vl, vr, l, r;
+			scanf("%d%d", &vl, &vr);
+			vl -= ans; vr -= ans;
+//			printf("vl = %d vr = %d\n", vl, vr);
+			int ql;
+			ql = lower_bound(v + 1, v + cnt + 1, vl) - v;
+			l = gl(vl); r = gr(vr);
+//			printf("l = %d r = %d ql = %d\n", l, r, ql);
 
 			using namespace segtree;
-			printf("%d\n", ans = query(rt[l - 1], rt[r], 0, cnt, 0, l - 1));
+			printf("%d\n", ans = query(rt[l - 1], rt[r], 0, cnt, 0, ql - 1));
 		}
 	}
 	return 0;
