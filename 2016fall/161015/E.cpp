@@ -46,6 +46,7 @@ void setbelong(int x, int f) {
 }
 
 int main(){
+	f[0] = 1e9;
 	scanf("%d", &n);
 	for(int i = 1; i < n; i ++) {
 		int x, y;
@@ -63,8 +64,11 @@ int main(){
 	for(int i = head[root]; i; i = nxt[i])
 		setbelong(to[i], to[i]);
 	yes[root] = 1;
-	for(int i = 1; i <= n; i ++) if (i != root)
-		if (n - size[i] - (belong[i] == mx0 ? size[mx0] : size[mx1]) <= n / 2) {
+
+	for(int i = 1; i <= n; i ++) if (i != root) {
+		if (n - size[i] - (belong[i] != mx0 ? size[mx0] : size[mx1]) <= n / 2)
+			yes[i] = 1;
+		if (i != mx0 && belong[i] == mx0 && n - size[i] - (n - size[mx0]) <= n / 2 && n - size[mx0] <= n / 2)
 			yes[i] = 1;
 		}
 	for(int i = 1; i <= n; i ++) printf("%d%c", yes[i], i == n ? '\n' : ' ');
