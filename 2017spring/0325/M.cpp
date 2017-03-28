@@ -8,45 +8,59 @@ using namespace std;
 const int N = 1010;
 
 int n;
-int fa[N], mp[N][N];
-bool used[N];
+int t[N << 2], l[N << 2], r[N << 2];
 
-int getnew()
+#define L (o << 1)
+#define R (o << 1 | 1)
+#define mid ((l + r) >> 1)
+char s[10];
+void ask(int o, int l, int r)
 {
-	for (int i = 1; i <= n; ++i)
-		if (!used[i]) return i;
-	return -1;
+	if (l == r) t[o] = l;
+	else {
+		ask(L, l, mid);
+		ask(R, mid + 1, r);
+		cout << "? " << t[L] << ' ' << t[R] << endl;
+		cin >> s;
+		if (s[0] == '<') t[o] = t[R];
+		else t[o] = t[L];
+	}
 }
+
 int main()
 {
 	ios::sync_with_stdio(false);
+	cin.tie(0);
+	cout.tie(0);
 	cin >> n;
-	int x, y;
-	x = getnew();
-	used[x] = 1;
-	y = getnew();
-	used[y] = 1;
-	char ans[5];
-	while (true) {
-		if (x == -1 || y == -1) break;
-		cout << "? " << x << ' ' << y << endl;
-		cin >> ans;
-		if (ans[0] == '<') {
-			mp[x][y] = -1;
-			mp[y][x] = 1;
-			used[x] = used[y] = 1;
-			y = getnew();
-		} else if (ans[0] == '>') {
-			mp[x][y] = 1;
-			mp[y][x] = -1;
-			used[x] = used[y] = 1;
-			x = getnew();
-		} else if (ans[0] == '=') {
-			used[x] = used[y] = 1;
-			y = getnew();
+	ask(1, 1, n);
+//	cout << "!!!" << endl;
+	int ans = 0;
+	int l = 1, r = n, o = 1;
+	if (t[R] == t[o]) {
+		ans = t[L];
+		o = R;
+		l = mid + 1;
+	} else {
+		ans = t[R];
+		o = L;
+		r = mid;
+	}
+	while (l < r) {
+		if (t[R] == t[o]) {
+			cout << "? " << ans << ' ' << t[L] << endl;
+			cin >> s;
+			if (s[0] == '<') ans = t[L];
+			o = R;
+			l = mid + 1;
+		} else {
+			cout << "? " << ans << ' ' << t[R] << endl;
+			cin >> s;
+			if (s[0] == '<') ans = t[R];
+			o = L;
+			r = mid;
 		}
 	}
-	if (x != -1) cout << "! " << x << endl;
-else cout << "! " << y << endl;
+	cout << "! " << ans << endl;
 	return 0;
 }
